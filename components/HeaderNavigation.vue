@@ -1,9 +1,9 @@
 <template>
-    <nav class="bg-blue-500">
+    <nav class="bg-blue-500 border-b-2 sticky top-0 z-10">
       <div class="container mx-auto px-4 flex justify-between items-center">
         <div class="py-5">
           <!-- Your logo or brand name -->
-          <NuxtLink to="/" class="text-white text-lg font-bold">LEYECO V</NuxtLink>
+          <NuxtLink to="/" class="text-white text-lg font-bold">LVUMS</NuxtLink>
         </div>
         <div class="hidden md:flex space-x-4">
           <!-- Navigation Links -->
@@ -13,7 +13,7 @@
         </div>
         <div class="flex items-center space-x-2">
           <!-- Right-side items -->
-          <button class="text-white">Login</button>
+          <UButton color="white" variant="solid" size="lg">Login</UButton>
           <!-- Responsive menu button -->
           <button @click="toggleMenu" class="md:hidden text-white">
             <span>Menu</span>

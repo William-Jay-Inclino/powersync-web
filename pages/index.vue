@@ -4,7 +4,7 @@
         <section class="bg-light text-white p-8">
             <div class="container mx-auto">
             <h2 class="text-4xl font-bold mb-12 text-center">
-                Welcome to Leyeco V Computerized System
+                Welcome to Leyeco V Unified Management System
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
                 <div class="item">
@@ -113,7 +113,7 @@
 </template>
 
 <script lang="ts" setup>
-
+import '~/assets/css/main.css'
 </script>
 
 <style lang="scss" scoped>
