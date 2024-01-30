@@ -1,8 +1,8 @@
 <template>
-    <HeaderNavigation />
     <div class="flex flex-col md:flex-row">
         <Sidebar/>
-        <main class="w-full p-8 md:w-2/3 overflow-auto">
+        <main class="w-full p-6 md:w-full overflow-auto">
+            <DashboardHeader/>
             <slot></slot>
         </main>
     </div>

@@ -1,22 +1,28 @@
 <template>
-    <aside class="bg-gray-800 text-white w-full md:w-1/6 md:sticky top-0 h-screen overflow-auto p-4">
-        <h1 class="font-medium">Dashboard</h1>
+    <aside class="bg-sky-800 text-white lg:w-1/6 md:sticky top-0 h-screen overflow-auto p-4" >
+        <div class="flex flex-row mb-4">
+            <h1 class="font-medium mr-2">LVUMS</h1>
+            <UBadge color="teal" variant="solid">Alpha Version</UBadge>
+        </div>
+        <div class="flex flex-row mb-4">
+            <h1 class="font-medium mr-2">Dashboard</h1>
+        </div>
         <UAccordion :items="items" :ui="{ wrapper: 'flex flex-col w-full' }">
             <template #default="{ item, index, open }">
-                <UButton color="gray" variant="ghost"
-                    :ui="{ rounded: 'rounded-none', padding: { sm: 'p-3' } }">
+                <UButton color="gray" variant="ghost" class="hover:bg-sky-600"
+                    :ui="{ padding: { sm: 'p-3' } }">
                     <template #leading>
                         <div
-                            class="w-6 h-6 rounded-full bg-primary-500 dark:bg-primary-400 flex items-center justify-center -my-1">
+                            class="w-6 h-6 rounded-full bg-sky-500 dark:bg-sky-400 flex items-center justify-center -my-1">
                             <UIcon :name="item.icon" class="w-4 h-4 text-white dark:text-gray-900" />
                         </div>
                     </template>
 
-                    <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
+                    <span class="truncate text-white dark:text-gray-900">{{ index + 1 }}. {{ item.label }}</span>
 
                     <template #trailing>
                         <UIcon name="i-heroicons-chevron-right-20-solid"
-                            class="w-5 h-5 ms-auto transform transition-transform duration-200"
+                            class="w-5 h-5 ms-auto transform transition-transform duration-200 text-white dark:text-gray-900"
                             :class="[open && 'rotate-90']" />
                     </template>
                 </UButton>
@@ -31,8 +37,8 @@
                         rounded: '',
                         font: '',
                         ring: '',
-                        active: 'text-primary-500 dark:text-primary-400 border-current font-semibold',
-                        inactive: 'border-transparent hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300'
+                        active: ' text-yellow-300 dark:text-primary-400 border-current font-semibold',
+                        inactive: 'border-transparent hover:border-gray-400 dark:hover:border-gray-500 text-white hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300'
                     }"
                 />
             </template>

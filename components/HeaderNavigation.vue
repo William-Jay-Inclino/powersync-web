@@ -13,7 +13,7 @@
         </div>
         <div class="flex items-center space-x-2">
           <!-- Right-side items -->
-          <UButton color="white" variant="solid" size="lg">Login</UButton>
+          <!-- <UButton color="white" variant="solid" size="lg">Login</UButton> -->
           <!-- Responsive menu button -->
           <button @click="toggleMenu" class="md:hidden text-white">
             <span>Menu</span>
