@@ -1,8 +1,11 @@
 <template>
     <aside class="bg-sky-800 text-white lg:w-1/6 md:sticky top-0 h-screen overflow-auto p-4" >
-        <div class="flex flex-row mb-4">
-            <h1 class="font-medium mr-2">LVUMS</h1>
-            <UBadge color="teal" variant="solid">Alpha Version</UBadge>
+        <div class="flex flex-row gap-1 mb-4">
+            <NuxtImg src="/logo.png" sizes="28px md:36px"/>
+            <h1 class="font-medium text-xl mr-2">LVUMS</h1>
+            <div>
+                <UBadge color="teal" variant="solid">Alpha</UBadge>
+            </div>
         </div>
         <div class="flex flex-row mb-4">
             <h1 class="font-medium mr-2">Dashboard</h1>

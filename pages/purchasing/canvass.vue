@@ -7,12 +7,15 @@
                 <div class="flex flex-col md:flex-row md:justify-between">
                     <div class="flex flex-col md:flex-row gap-6">
                         <UFormGroup label="RC Number">
+                            <!-- @vue-expect-error -->
                             <USelect v-model="selectedRc" :options="rcnumbers" />
                         </UFormGroup>
                         <UFormGroup label="Date">
+                                <!-- @vue-expect-error -->
                                 <UInput type="date" v-model="selectedDate" placeholder="Select date..."/>
                         </UFormGroup>
                         <UFormGroup label="Requisitioner">
+                            <!-- @vue-expect-error -->
                             <USelect v-model="selectedRequisitioner" :options="requisitioners" />
                         </UFormGroup>
                         <div class="flex justify-center items-center">
