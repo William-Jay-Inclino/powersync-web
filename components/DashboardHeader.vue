@@ -31,6 +31,11 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useAuthStore } from '~/stores/auth';
+
+const authStore = useAuthStore()
+
 const breadcrumbs = [{
   label: 'Home',
   icon: 'i-heroicons-home',
@@ -40,9 +45,9 @@ const breadcrumbs = [{
   icon: 'i-heroicons-queue-list-solid'
 }]
 
-const profileItems = [
+const profileItems = ref([
   [{
-    label: 'william@leyeco.com',
+    label: authStore.isLoggedIn ? authStore.currentUser.email : 'default@leyeco.com',
     slot: 'account',
     disabled: true
   }], [{
@@ -50,7 +55,8 @@ const profileItems = [
     icon: 'i-heroicons-cog-8-tooth'
   }], [{
     label: 'Sign out',
-    icon: 'i-heroicons-arrow-left-on-rectangle'
+    icon: 'i-heroicons-arrow-left-on-rectangle',
+    to: '/auth/login'
   }]
-]
+])
 </script>
