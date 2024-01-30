@@ -21,7 +21,7 @@
         </div>
         </template>
 
-        <template #item="{ item }">
+        <template #item="{ item }" >
         <span class="truncate">{{ item.label }}</span>
 
         <UIcon :name="item.icon" class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto" />
@@ -33,8 +33,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useAuthStore } from '~/stores/auth';
+import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore()
+const router = useRouter()
 
 const breadcrumbs = [{
   label: 'Home',

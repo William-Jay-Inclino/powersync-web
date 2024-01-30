@@ -75,14 +75,12 @@
                 </div>
                 <div class="item">
                     <UContainer>
-                        <RouterLink to="/purchasing/canvass">
-                            <div class="flex flex-col p-16">
+                            <div class="flex flex-col p-16" @click="router.push('/purchasing/canvass')">
                                 <div class="flex justify-center items-center gap-4">
                                     <UIcon name="i-heroicons-home-modern-16-solid" class="text-6xl text-black"/>
                                     <h1 class="font-black text-black text-xl">POWERHOUSE</h1>
                                 </div>
                             </div>
-                        </RouterLink>
                     </UContainer>
                     <NuxtHoverEffect/>
                 </div>

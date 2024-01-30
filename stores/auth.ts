@@ -34,11 +34,16 @@ export const useAuthStore = defineStore('auth', () => {
         return false
     }
 
+    function logoutUser() {
+        isLoggedIn.value = false
+    }
+
     return {
         //state
         isLoggedIn,
         currentUser,
         //method
-        authenticateUser
+        authenticateUser,
+        logoutUser
     }
 })
