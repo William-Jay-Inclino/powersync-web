@@ -1,12 +1,22 @@
 <template>
 <div class=" bg-sky-600 text-white flex justify-between rounded-lg p-4 items-center">
-    <UBreadcrumb :links="breadcrumbs" :ui="{
+    <UBreadcrumb :links="breadcrumbs" class="hidden md:block" :ui="{
         active: 'text-white hover:text-slate-200',
         inactive: 'text-white',
         divider: {
             base: 'text-white'
         }
     }"/>
+    <UButton
+      icon="i-heroicons-bars-3-bottom-left-16-solid"
+      size="sm"
+      color="yellow"
+      square
+      variant="ghost"
+      class="sm:block md:hidden"
+      @click="uiStore.isMobileSidebarOpen = !uiStore.isMobileSidebarOpen"
+    />
+
     <UDropdown :items="profileItems" :ui="{ item: { disabled: 'cursor-text select-text' } }" :popper="{ placement: 'bottom-start' }">
         <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" />
 
@@ -33,9 +43,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useAuthStore } from '~/stores/auth';
+import { useUiStore } from '~/stores/ui';
 import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 const router = useRouter()
 
 const breadcrumbs = [{

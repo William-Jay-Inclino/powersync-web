@@ -1,10 +1,23 @@
 <template>
-    <aside class="bg-sky-800 text-white lg:w-1/6 md:sticky top-0 h-screen overflow-auto p-4" >
-        <div class="flex flex-row gap-1 mb-4">
-            <NuxtImg src="/logo.png" sizes="28px md:36px"/>
-            <h1 class="font-medium text-xl mr-2">LVUMS</h1>
+    <aside class="bg-sky-800 text-white lg:w-1/6 md:sticky top-0 h-screen overflow-auto p-4" :class="slideOver ? '' : 'hidden md:block'">
+        <div class="flex justify-between mb-4">
+            <div class="flex flex-row gap-1">
+                <NuxtImg src="/logo.png" sizes="28px md:36px"/>
+                <h1 class="font-medium text-xl mr-2">LVUMS</h1>
+                <div>
+                    <UBadge color="teal" variant="solid">Alpha</UBadge>
+                </div>
+            </div>
             <div>
-                <UBadge color="teal" variant="solid">Alpha</UBadge>
+                <UButton
+                    icon="i-heroicons-x-mark-16-solid"
+                    size="sm"
+                    color="yellow"
+                    square
+                    variant="ghost"
+                    class="block md:hidden"
+                    @click="uiStore.isMobileSidebarOpen = !uiStore.isMobileSidebarOpen"
+                />
             </div>
         </div>
         <div class="flex flex-row mb-4">
@@ -53,6 +66,15 @@
 </template>
 
 <script setup lang="ts">
+import { useUiStore } from '~/stores/ui';
+
+
+defineProps({
+  slideOver: Boolean
+})
+
+const uiStore = useUiStore()
+
 const isSidebarOpen = useState('isSidebarOpen', () => false)
 const items = [{
     label: 'Purchasing',
