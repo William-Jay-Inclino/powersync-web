@@ -7,15 +7,15 @@
                 <div class="flex flex-col md:flex-row md:justify-between">
                     <div class="flex flex-col md:flex-row gap-6">
                         <UFormGroup label="RC Number">
-                            <!-- @vue-expect-error -->
+                            <!-- @vue-expect-error-->
                             <USelect v-model="selectedRc" :options="rcnumbers" />
                         </UFormGroup>
                         <UFormGroup label="Date">
-                                <!-- @vue-expect-error -->
+                            <!-- @vue-expect-error-->
                                 <UInput type="date" v-model="selectedDate" placeholder="Select date..."/>
                         </UFormGroup>
                         <UFormGroup label="Requisitioner">
-                            <!-- @vue-expect-error -->
+                            <!-- @vue-expect-error-->
                             <USelect v-model="selectedRequisitioner" :options="requisitioners" />
                         </UFormGroup>
                         <div class="flex justify-center items-center">
@@ -29,13 +29,15 @@
                         </div>
                     </div>
                     <div class="flex justify-center items-center">
-                        <UButton
-                            icon="i-heroicons-plus-circle"
-                            size="lg"
-                            color="blue"
-                            variant="solid"
-                            label="Add Canvass"
-                        />
+                        <RouterLink to="/purchasing/canvass/form">
+                            <UButton
+                                icon="i-heroicons-plus-circle"
+                                size="lg"
+                                color="blue"
+                                variant="solid"
+                                label="Add Canvass"
+                            />
+                        </RouterLink>
                     </div>
                 </div>
             </UCard>
@@ -58,6 +60,8 @@
 </template>
 
 <script setup lang="ts">
+import { format } from 'date-fns'
+
 definePageMeta({
     layout: 'dashboard-default'
 })
@@ -75,6 +79,7 @@ const selectedRc = useState('selectedRcFilter')
 const selectedDate = useState('selectedDate')
 const requisitioners = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon']
 const selectedRequisitioner = useState('selectedRequisitioner')
+const date = useState('date', () => new Date())
 
 const columns = [{
   key: 'rc_number',
@@ -114,7 +119,7 @@ const records:Array<Canvass> = [
 ];
 
 //@ts-expect-error
-const selectedRow:Array<Canvass> = useState('selectedRow',() => [records[1]])
+const selectedRow:Array<Canvass> = useState('selectedRow',() => [])
 
 
 
