@@ -5,7 +5,7 @@ import type { User } from './types'
 export const useAuthStore = defineStore('auth', () => {
     //state
     const currentUser:User = {
-        username: 'Jay',
+        username: 'devjay',
         email: 'william@leyeco.com',
         firstname: 'William Jay',
         lastname: 'Inclino',
@@ -16,8 +16,8 @@ export const useAuthStore = defineStore('auth', () => {
     //actions
     function authenticateUser(user:User){
         if (user) {
-            if (!user.email) {
-                console.error("User email is undefined")
+            if (!user.username) {
+                console.error("Username is undefined")
                 return false
             }
             if (!user.password) {
@@ -25,7 +25,7 @@ export const useAuthStore = defineStore('auth', () => {
                 return false
             }
 
-            if (user.email === currentUser.email && user.password === currentUser.password) {
+            if (user.username === currentUser.username && user.password === currentUser.password) {
                 isLoggedIn.value = true
                 return true
             }
