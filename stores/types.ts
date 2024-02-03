@@ -23,3 +23,8 @@ export interface Particular {
     unit: string
     quantity: number
 }
+
+export const enum FORM_MODE { 
+    ADD = 'ADD',
+    EDIT = 'EDIT'
+}

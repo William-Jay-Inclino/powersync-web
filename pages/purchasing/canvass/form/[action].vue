@@ -4,7 +4,7 @@
         <UContainer>
           <UCard class="mt-4">
             <div class="flex justify-between">
-              <h1 class=" text-xl font-bold mt-2">Add Canvass</h1>
+              <h1 class=" text-xl font-bold mt-2">{{ formMode }} Canvass</h1>
               <div class="flex gap-2">
                 <UButton
                   icon="i-heroicons-printer-solid"
@@ -122,23 +122,36 @@
 <script setup lang="ts">
 import { useCanvassStore } from '~/stores/canvass'
 import type { Canvass } from '~/stores/types'
+import { FORM_MODE } from '~/stores/types'
 definePageMeta({
     layout: 'dashboard-default'
 })
 
-const route = useRouter()
+const route = useRoute()
 const toast = useToast()
 const canvassStore = useCanvassStore()
 
 //state
-const rcNumber = useState<string>('rcNumber',() => useIncrementStringKey(canvassStore.getLastCanvass().rc_number))
-const selectedDate = useState<string>('selectedDate')
-const requisitioners = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon']
-const selectedRequisitioner = ref<string>('')
-const approvers = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon','Inclino, William','Tayag, Joshua']
-const selectedApprover = useState<string>('selectedApprovers')
-const purpose = useState<string>('purpose')
-const notes = useState<string>('notes')
+const formMode = ref(route.params.action === 'add' ? FORM_MODE.ADD : FORM_MODE.EDIT)
+const canvassData = computed(():Canvass => {
+  if (formMode.value === FORM_MODE.EDIT) {
+    const canvass = canvassStore.canvassRecords.find(cvs => cvs.rc_number === route.params.action)
+    if (canvass) {
+      return canvass
+    }
+    return {} as Canvass
+  }
+  return {} as Canvass
+})
+
+const rcNumber = useState<string>('rcNumbxer',() => formMode.value === FORM_MODE.ADD ? useIncrementStringKey(canvassStore.getLastCanvass().rc_number) : canvassData.value.rc_number)
+const selectedDate = useState<string>('selectedDate',() => formMode.value === FORM_MODE.EDIT ? canvassData.value.date : '')
+const requisitioners = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon','Inclino, William Jay I.']
+const selectedRequisitioner = ref<string>(formMode.value === FORM_MODE.EDIT ? canvassData.value.requisitioner : '')
+const approvers = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon','Inclino, William Jay I.','Tayag, Joshua']
+const selectedApprover = useState<string>('selectedApprovers',() => formMode.value === FORM_MODE.EDIT ? canvassData.value.notedby : '')
+const purpose = useState<string>('purpose',() => formMode.value === FORM_MODE.EDIT ? canvassData.value.purpose : '')
+const notes = useState<string | undefined>('notes',() => formMode.value === FORM_MODE.EDIT ? canvassData.value.notes : '')
 const isErrorModalActive = useState('isErrorModalActive', () => false)
 const formErrorMessage = useState('formErrorMessage')
 
@@ -166,10 +179,29 @@ const brands:Array<string> = ['n/a','Brand X','Brand Y','Brand Z']
 const units:Array<string> = ['Pieces','Cartons','Pallets']
 
 //Mock table data
-const particulars = ref<Array<Particular>>([
+const particulars = ref<Array<Particular>>(formMode.value === FORM_MODE.ADD ? 
+  [
   {number: 1,description: '',brand: '',unit:'',quantity: 0}
-])
+  ] :
+  canvassData.value.particulars ? canvassData.value.particulars : []
+  )
 
+function populateCanvassForm() {
+  if (route.params.action !== 'add') {
+    const canvass = canvassStore.canvassRecords.find(cvs => cvs.rc_number === route.params.action)
+    if (canvass) {
+      rcNumber.value = canvass.rc_number
+      selectedDate.value = canvass.date
+      selectedRequisitioner.value  = canvass.requisitioner
+      selectedApprover.value = canvass.notedby
+      purpose.value = canvass.purpose
+      notes.value = canvass.notes ?? ''
+      if (canvass.particulars && canvass.particulars.length > 0) {
+        particulars.value = canvass.particulars
+      }
+    }
+  }
+}
 function onAddItem() {
   const lastRecord = particulars.value[particulars.value.length - 1]
   const index = particulars.value.indexOf(lastRecord)
@@ -215,13 +247,18 @@ function validateCanvassForm():boolean {
 
   //check particulars
   if (particulars.value.length <= 0) {
-    return false
-  }
-  const isParticularItemInvalid = particulars.value.find(pa => 
-    !pa.brand || !pa.description || !pa.quantity || !pa.unit
-  )
+    particularsHasError = true
+  }else{
+    const isParticularItemInvalid = particulars.value.find(pa => 
+      !pa.brand || !pa.description || !pa.quantity || !pa.unit
+    )
 
-  if (isParticularItemInvalid) {
+    if (isParticularItemInvalid) {
+      particularsHasError = true
+    }
+  }
+
+  if (particularsHasError) {
     formErrorMessage.value = 'There are one or more particular items with empty or invalid values.'
     return false
   }

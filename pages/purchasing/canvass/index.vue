@@ -29,7 +29,7 @@
                         </div>
                     </div>
                     <div class="flex justify-center items-center">
-                        <RouterLink to="/purchasing/canvass/form">
+                        <RouterLink to="/purchasing/canvass/form/add">
                             <UButton
                                 icon="i-heroicons-plus-circle"
                                 size="lg"
@@ -130,8 +130,8 @@ const tableActions = (row:Canvass) => [
   [{
     label: 'Edit',
     icon: 'i-heroicons-pencil-square-20-solid',
-    click: () => console.log('Edit', row.requisitioner)
-  }, {
+    click: () => navigateTo({path: `/purchasing/canvass/form/${row.rc_number}`})
+  },{
     label: 'Delete',
     icon: 'i-heroicons-trash-20-solid',
     click: () => toggleDeleteModal(row)

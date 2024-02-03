@@ -6,7 +6,14 @@ export const useCanvassStore = defineStore('canvass', () => {
 
     //Mock table data
     const canvassRecords = ref<Array<Canvass>>([
-        { rc_number: "24-00015", requisitioner: "Inclino, William Jay I.", date: "2024-01-12", notedby: '', purpose: ''},
+        { rc_number: "24-00015", requisitioner: "Inclino, William Jay I.", date: "2024-01-12", notedby: 'Pastor, Anna Maria L.', purpose: 'Testing',
+        particulars: [{
+            number: 1,
+            description: 'Canned Tuna',
+            brand: 'Brand X',
+            unit: 'Cartons',
+            quantity: 1
+        }]},
         { rc_number: "24-00016", requisitioner: "Pastor, Ana Maria L.", date: "2024-01-12", notedby: '', purpose: '' },
         { rc_number: "24-00017", requisitioner: "Inclino, William Jay I.", date: "2024-01-11", notedby: '', purpose: '' },
         { rc_number: "24-00018", requisitioner: "Sanico, Marlon", date: "2024-01-11", notedby: '', purpose: '' },
