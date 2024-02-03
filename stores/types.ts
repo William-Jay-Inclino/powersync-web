@@ -6,6 +6,16 @@ export interface User {
     password: string
 }
 
+export interface Canvass {
+    rc_number: string
+    requisitioner: string
+    date:string
+    notedby:string
+    purpose:string
+    notes?:string
+    particulars?: Array<Particular>
+}
+
 export interface Particular {
     number: number
     description: string

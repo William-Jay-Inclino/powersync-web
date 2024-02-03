@@ -43,7 +43,7 @@
             </UCard>
             <UContainer class="w-full">
                 <div class="md:mt-6">List of Canvass</div>
-                <UTable v-model="selectedRow" :rows="records" :columns="columns">
+                <UTable v-model="selectedRow" :rows="rows" :columns="columns">
                     <template #name-data="{ row }">
                     <span :class="[selectedRow.find(req => req.rc_number === row.rc_number) && 'text-primary-500 dark:text-primary-400']">{{ row.name }}</span>
                     </template>
@@ -54,24 +54,55 @@
                     </UDropdown>
                     </template>
                 </UTable>
+                <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+                    <UPagination v-model="page" :page-count="pageCount" :total="canvassStore.canvassRecords.length" />
+                </div>
             </UContainer>
         </div>
+        <UModal v-model="isDeleteModalActive">
+            <UCard>
+                <div class="flex flex-col gap-4 justify-center items-center">
+                    <UIcon name="i-heroicons-exclamation-triangle-solid" class="text-3xl text-red-600"/>
+                    <h1 class="font-bold text-xl">Delete Canvass</h1>
+                    <p>Are you sure you want to delete canvass item with <b>RC number {{ selectedActionItem.rc_number }}</b>?</p>
+                </div>
+                <template #footer>
+                    <div class="flex justify-between md:justify-end items-center gap-2">
+                        <UButton
+                            size="md"
+                            color="blue"
+                            variant="ghost"
+                            label="Cancel"
+                            :trailing="false"
+                            @click="isDeleteModalActive = !isDeleteModalActive"
+                        />
+                        <UButton
+                            icon="i-heroicons-trash-16-solid"
+                            size="md"
+                            color="red"
+                            variant="solid"
+                            label="Delete"
+                            :trailing="false"
+                            @click="onDeleteCanvass"
+                        />
+                    </div>
+                </template>
+            </UCard>
+        </UModal>
+        <UNotifications/>
     </div>
 </template>
 
 <script setup lang="ts">
-import { format } from 'date-fns'
+import { useCanvassStore } from '~/stores/canvass'
+import type { Canvass } from '~/stores/types';
 
 definePageMeta({
     layout: 'dashboard-default'
 })
 
-//temporary interface
-interface Canvass {
-    rc_number: string
-    requisitioner: string
-    date:string
-}
+const canvassStore = useCanvassStore()
+const toast = useToast()
 
 //state
 const rcnumbers = ['24-00015', '24-00016', '24-00017']
@@ -79,7 +110,8 @@ const selectedRc = useState('selectedRcFilter')
 const selectedDate = useState('selectedDate')
 const requisitioners = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon']
 const selectedRequisitioner = useState('selectedRequisitioner')
-const date = useState('date', () => new Date())
+const isDeleteModalActive = useState('selectedRequisitioner', () => false)
+const selectedActionItem = useState<Canvass>('selectedActionItem')
 
 const columns = [{
   key: 'rc_number',
@@ -101,27 +133,43 @@ const tableActions = (row:Canvass) => [
     click: () => console.log('Edit', row.requisitioner)
   }, {
     label: 'Delete',
-    icon: 'i-heroicons-trash-20-solid'
+    icon: 'i-heroicons-trash-20-solid',
+    click: () => toggleDeleteModal(row)
   }]
 ]
 
-//Mock table data
-const records:Array<Canvass> = [
-  { rc_number: "24-00015", requisitioner: "Inclino, William Jay I.", date: "2024-01-12" },
-  { rc_number: "24-00014", requisitioner: "Pastor, Ana Maria L.", date: "2024-01-12" },
-  { rc_number: "24-00013", requisitioner: "Inclino, William Jay I.", date: "2024-01-11" },
-  { rc_number: "24-0012", requisitioner: "Sanico, Marlon", date: "2024-01-11" },
-  { rc_number: "24-0011", requisitioner: "Pastor, Ana Maria L.", date: "2024-01-08" },
-  { rc_number: "24-00010", requisitioner: "Pelones, Jessa X.", date: "2024-01-11" },
-  { rc_number: "24-00008", requisitioner: "Dayandayan, Jannie Ann", date: "2024-01-01" },
-  { rc_number: "24-0007", requisitioner: "Dayandayan, Jannie Ann", date: "2024-01-01" },
-  { rc_number: "24-00006", requisitioner: "Dayandayan, Jannie Ann", date: "2024-01-01" }
-];
-
 //@ts-expect-error
 const selectedRow:Array<Canvass> = useState('selectedRow',() => [])
+const page = ref(1)
+const pageCount = 5
 
+const rows = computed(() => {
+  const records = canvassStore.canvassRecords
+  return records.slice((page.value - 1) * pageCount, (page.value) * pageCount)
+})
 
+//methods
+function toggleDeleteModal(item:Canvass){
+    isDeleteModalActive.value = !isDeleteModalActive.value
+    selectedActionItem.value = item
+}
 
+function onDeleteCanvass() {
+    if (!selectedActionItem.value) {
+        toast.add({
+            title: 'No canvass item selected',
+            icon: 'i-heroicons-x-mark-16-solid'
+        })
+        return
+    }
+    const index = canvassStore.canvassRecords.indexOf(selectedActionItem.value)
+    canvassStore.canvassRecords.splice(index,1)
+    isDeleteModalActive.value = !isDeleteModalActive.value
+    toast.add({
+            title: 'Canvass successfuly deleted',
+            icon: 'i-heroicons-check-circle-20-solid'
+        })
+    return
+}
 
 </script>
