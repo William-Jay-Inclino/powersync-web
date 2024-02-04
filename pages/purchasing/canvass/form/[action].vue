@@ -189,7 +189,6 @@ const particulars = ref<Array<Particular>>(formMode.value === FORM_MODE.ADD ?
 
 function onAddItem() {
   const lastRecord = particulars.value[particulars.value.length - 1]
-  const index = particulars.value.indexOf(lastRecord)
   const newItem:Particular = {
     number: lastRecord.number++,
     description: '',
@@ -201,8 +200,9 @@ function onAddItem() {
   particulars.value.splice(particulars.value.length - 1,0,newItem)
 }
 
-function onDeleteItem() {
-  particulars.value.pop()
+function onDeleteItem(item:Particular) {
+  const index  = particulars.value.indexOf(item)
+  particulars.value.splice(index,1)
 }
 
 function validateCanvassForm():boolean {
