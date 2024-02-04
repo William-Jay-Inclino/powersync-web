@@ -97,7 +97,7 @@
         <UModal v-model="isErrorModalActive">
             <UCard>
                 <div class="flex flex-col gap-4 justify-center items-center">
-                    <UIcon name="i-heroicons-exclamation-triangle-solid" class="text-3xl text-red-600"/>
+                    <UIcon name="i-heroicons-exclamation-triangle-solid" class="text-6xl text-red-600"/>
                     <h1 class="font-bold text-xl">Invalid Form Inputs</h1>
                     <p>{{  formErrorMessage }}. Please enter a valid value</p>
                 </div>
@@ -144,7 +144,7 @@ const canvassData = computed(():Canvass => {
   return {} as Canvass
 })
 
-const rcNumber = useState<string>('rcNumbxer',() => formMode.value === FORM_MODE.ADD ? useIncrementStringKey(canvassStore.getLastCanvass().rc_number) : canvassData.value.rc_number)
+const rcNumber = useState<string>('rcNumber',() => formMode.value === FORM_MODE.ADD ? useIncrementStringKey(canvassStore.getLastCanvass().rc_number) : canvassData.value.rc_number)
 const selectedDate = useState<string>('selectedDate',() => formMode.value === FORM_MODE.EDIT ? canvassData.value.date : '')
 const requisitioners = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon','Inclino, William Jay I.']
 const selectedRequisitioner = ref<string>(formMode.value === FORM_MODE.EDIT ? canvassData.value.requisitioner : '')
@@ -186,22 +186,7 @@ const particulars = ref<Array<Particular>>(formMode.value === FORM_MODE.ADD ?
   canvassData.value.particulars ? canvassData.value.particulars : []
   )
 
-function populateCanvassForm() {
-  if (route.params.action !== 'add') {
-    const canvass = canvassStore.canvassRecords.find(cvs => cvs.rc_number === route.params.action)
-    if (canvass) {
-      rcNumber.value = canvass.rc_number
-      selectedDate.value = canvass.date
-      selectedRequisitioner.value  = canvass.requisitioner
-      selectedApprover.value = canvass.notedby
-      purpose.value = canvass.purpose
-      notes.value = canvass.notes ?? ''
-      if (canvass.particulars && canvass.particulars.length > 0) {
-        particulars.value = canvass.particulars
-      }
-    }
-  }
-}
+
 function onAddItem() {
   const lastRecord = particulars.value[particulars.value.length - 1]
   const index = particulars.value.indexOf(lastRecord)

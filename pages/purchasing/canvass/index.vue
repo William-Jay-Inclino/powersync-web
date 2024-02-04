@@ -62,7 +62,7 @@
         <UModal v-model="isDeleteModalActive">
             <UCard>
                 <div class="flex flex-col gap-4 justify-center items-center">
-                    <UIcon name="i-heroicons-exclamation-triangle-solid" class="text-3xl text-red-600"/>
+                    <UIcon name="i-heroicons-exclamation-triangle-solid" class="text-6xl text-red-600"/>
                     <h1 class="font-bold text-xl">Delete Canvass</h1>
                     <p>Are you sure you want to delete canvass item with <b>RC number {{ selectedActionItem.rc_number }}</b>?</p>
                 </div>

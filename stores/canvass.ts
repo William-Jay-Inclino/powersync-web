@@ -14,7 +14,14 @@ export const useCanvassStore = defineStore('canvass', () => {
             unit: 'Cartons',
             quantity: 1
         }]},
-        { rc_number: "24-00016", requisitioner: "Pastor, Ana Maria L.", date: "2024-01-12", notedby: '', purpose: '' },
+        { rc_number: "24-00016", requisitioner: "Pastor, Anna Maria L.", date: "2024-01-12", notedby: 'Inclino, William Jay I.', purpose: 'Order',
+        particulars: [{
+            number: 1,
+            description: 'Soap',
+            brand: 'Brand Y',
+            unit: 'Cartons',
+            quantity: 1
+        }] },
         { rc_number: "24-00017", requisitioner: "Inclino, William Jay I.", date: "2024-01-11", notedby: '', purpose: '' },
         { rc_number: "24-00018", requisitioner: "Sanico, Marlon", date: "2024-01-11", notedby: '', purpose: '' },
         { rc_number: "24-00019", requisitioner: "Pastor, Ana Maria L.", date: "2024-01-08", notedby: '', purpose: '' },
