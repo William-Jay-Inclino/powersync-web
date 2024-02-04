@@ -120,10 +120,6 @@
 </template>
 
 <script setup lang="ts">
-import { useCanvassStore } from '~/stores/canvass'
-import { useUiStore } from '~/stores/ui'
-import type { Canvass } from '~/stores/types'
-import { FORM_MODE } from '~/stores/types'
 definePageMeta({
     layout: 'dashboard-default',
     middleware: 'canvass'
@@ -169,14 +165,8 @@ const canvassData = computed(():Canvass => {
   return {} as Canvass
 })
 
-const rcNumber = useState<string>('rcNumber',() => canvassStore.currentCanvass.rc_number)
-const selectedDate = useState<string>('selectedDate',() => formMode.value === FORM_MODE.EDIT ? canvassData.value.date : '')
 const requisitioners = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon','Inclino, William Jay I.']
-const selectedRequisitioner = ref<string>(formMode.value === FORM_MODE.EDIT ? canvassData.value.requisitioner : '')
 const approvers = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon','Inclino, William Jay I.','Tayag, Joshua']
-const selectedApprover = useState<string>('selectedApprovers',() => formMode.value === FORM_MODE.EDIT ? canvassData.value.notedby : '')
-const purpose = useState<string>('purpose',() => formMode.value === FORM_MODE.EDIT ? canvassData.value.purpose : '')
-const notes = useState<string | undefined>('notes',() => formMode.value === FORM_MODE.EDIT ? canvassData.value.notes : '')
 const isErrorModalActive = useState('isErrorModalActive', () => false)
 const formErrorMessage = useState('formErrorMessage')
 
@@ -204,7 +194,7 @@ const brands:Array<string> = ['n/a','Brand X','Brand Y','Brand Z']
 const units:Array<string> = ['Pieces','Cartons','Pallets']
 
 //Mock table data
-const particulars = ref<Array<Particular>>(formMode.value === FORM_MODE.ADD ? 
+const particulars = ref<Array<CanvassItem>>(formMode.value === FORM_MODE.ADD ? 
   [
   {number: 1,description: '',brand: '',unit:'',quantity: 0}
   ] :
@@ -214,7 +204,7 @@ const particulars = ref<Array<Particular>>(formMode.value === FORM_MODE.ADD ?
 
 function onAddItem() {
   const lastRecord = particulars.value[particulars.value.length - 1]
-  const newItem:Particular = {
+  const newItem:CanvassItem = {
     number: lastRecord.number++,
     description: '',
     brand: '',
@@ -225,7 +215,7 @@ function onAddItem() {
   particulars.value.splice(particulars.value.length - 1,0,newItem)
 }
 
-function onDeleteItem(item:Particular) {
+function onDeleteItem(item:CanvassItem) {
   const index  = particulars.value.indexOf(item)
   particulars.value.splice(index,1)
 }
