@@ -95,6 +95,7 @@
 
 <script setup lang="ts">
 import { useCanvassStore } from '~/stores/canvass'
+import { useUiStore } from '~/stores/ui'
 import type { Canvass } from '~/stores/types';
 
 definePageMeta({
@@ -102,10 +103,28 @@ definePageMeta({
 })
 
 const canvassStore = useCanvassStore()
+const uiStore = useUiStore()
 const toast = useToast()
 
+//Update breadcrumbs
+uiStore.breadcrumb = [
+        {
+            label: 'Home',
+            icon: 'i-heroicons-queue-list-solid',
+            to: '/'
+        },
+        {
+            label: 'Purchasing',
+            icon: 'i-heroicons-shopping-cart-16-solid'
+        },
+        {
+            label: 'Canvass',
+            icon: 'i-heroicons-clipboard-document-list'
+        }
+    ]
+
 //state
-const rcnumbers = ['24-00015', '24-00016', '24-00017']
+const rcnumbers = useState('rcnumbers',() => canvassStore.canvassRecords.map(cvs => cvs.rc_number))
 const selectedRc = useState('selectedRcFilter')
 const selectedDate = useState('selectedDate')
 const requisitioners = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon']

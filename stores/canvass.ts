@@ -3,7 +3,14 @@ import type { Canvass } from '~/stores/types';
 
 export const useCanvassStore = defineStore('canvass', () => {
     //state
-
+    const currentCanvass = ref<Canvass>({
+        rc_number: '',
+        requisitioner: '',
+        date: '',
+        notedby: '',
+        purpose: '',
+        particulars: []
+    })
     //Mock table data
     const canvassRecords = ref<Array<Canvass>>([
         { rc_number: "24-00015", requisitioner: "Inclino, William Jay I.", date: "2024-01-12", notedby: 'Pastor, Anna Maria L.', purpose: 'Testing',
@@ -39,6 +46,7 @@ export const useCanvassStore = defineStore('canvass', () => {
 
 
     return {
+        currentCanvass,
         canvassRecords,
         //methods
         getLastCanvass

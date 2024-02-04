@@ -24,6 +24,12 @@ export interface Particular {
     quantity: number
 }
 
+export interface Breadcrumb {
+    label:string
+    icon:string
+    to?:string
+}
+
 export const enum FORM_MODE { 
     ADD = 'ADD',
     EDIT = 'EDIT'

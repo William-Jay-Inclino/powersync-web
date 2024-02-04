@@ -1,8 +1,9 @@
 <template>
 <div class=" bg-sky-600 text-white flex justify-between rounded-lg p-4 items-center">
-    <UBreadcrumb :links="breadcrumbs" class="hidden md:block" :ui="{
-        active: 'text-white hover:text-slate-200',
-        inactive: 'text-white',
+    <UBreadcrumb :links="uiStore.breadcrumb" class="hidden md:block" :ui="{
+        active: 'text-white hover:text-yellow-200 hover:cursor-pointer',
+        inactive: 'text-white hover:text-yellow-200',
+        base: 'text-white',
         divider: {
             base: 'text-white'
         }
@@ -44,20 +45,9 @@
 import { ref } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useUiStore } from '~/stores/ui';
-import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore()
 const uiStore = useUiStore()
-const router = useRouter()
-
-const breadcrumbs = [{
-  label: 'Home',
-  icon: 'i-heroicons-home',
-  to: '/'
-}, {
-  label: 'Canvass',
-  icon: 'i-heroicons-queue-list-solid'
-}]
 
 const profileItems = ref([
   [{

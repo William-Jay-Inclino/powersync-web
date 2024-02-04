@@ -32,23 +32,23 @@
                   <h1 class="font-bold">Details</h1>
                 </template>
                 <div class="flex flex-col gap-4">
-                  <UFormGroup label="RC Number">
-                      <UInput v-model="rcNumber" placeholder="Enter RC number"/>
+                  <UFormGroup label="RC number" v-if="$route.params.action !== 'add'">
+                      <UInput v-model="canvassStore.currentCanvass.rc_number" disabled/>
                   </UFormGroup>
-                  <UFormGroup label="Date" required :error="!selectedDate && 'Invalid date'">
-                      <UInput type="date" v-model="selectedDate" placeholder="Select date..."/>
+                  <UFormGroup label="Date" required :error="!canvassStore.currentCanvass.date && 'Invalid date'">
+                      <UInput type="date" v-model="canvassStore.currentCanvass.date" placeholder="Select date..."/>
                   </UFormGroup>
-                  <UFormGroup label="Requisitioner" required :error="!selectedRequisitioner && 'Invalid requisitioner'">
-                      <USelect v-model="selectedRequisitioner" :options="requisitioners" />
+                  <UFormGroup label="Requisitioner" required :error="!canvassStore.currentCanvass.requisitioner && 'Invalid requisitioner'">
+                      <USelect v-model="canvassStore.currentCanvass.requisitioner" :options="requisitioners" />
                   </UFormGroup>
-                  <UFormGroup label="Noted by" required :error="!selectedApprover && 'Invalid approver'">
-                      <USelect v-model="selectedApprover" :options="approvers" />
+                  <UFormGroup label="Noted by" required :error="!canvassStore.currentCanvass.notedby && 'Invalid approver'">
+                      <USelect v-model="canvassStore.currentCanvass.notedby" :options="approvers" />
                   </UFormGroup>
-                  <UFormGroup label="Purpose" required :error="!purpose && 'Invalid purpose'">
-                    <UTextarea v-model="purpose" />
+                  <UFormGroup label="Purpose" required :error="!canvassStore.currentCanvass.purpose && 'Invalid purpose'">
+                    <UTextarea v-model="canvassStore.currentCanvass.purpose" />
                   </UFormGroup>
                   <UFormGroup label="Notes">
-                    <UTextarea v-model="notes" />
+                    <UTextarea v-model="canvassStore.currentCanvass.notes" />
                   </UFormGroup>
                 </div>
               </UCard>
@@ -99,7 +99,7 @@
                 <div class="flex flex-col gap-4 justify-center items-center">
                     <UIcon name="i-heroicons-exclamation-triangle-solid" class="text-6xl text-red-600"/>
                     <h1 class="font-bold text-xl">Invalid Form Inputs</h1>
-                    <p>{{  formErrorMessage }}. Please enter a valid value</p>
+                    <p>{{  formErrorMessage }} Please enter a valid value</p>
                 </div>
                 <template #footer>
                     <div class="flex justify-between md:justify-end items-center gap-2">
@@ -121,15 +121,40 @@
 
 <script setup lang="ts">
 import { useCanvassStore } from '~/stores/canvass'
+import { useUiStore } from '~/stores/ui'
 import type { Canvass } from '~/stores/types'
 import { FORM_MODE } from '~/stores/types'
 definePageMeta({
-    layout: 'dashboard-default'
+    layout: 'dashboard-default',
+    middleware: 'canvass'
 })
 
 const route = useRoute()
 const toast = useToast()
 const canvassStore = useCanvassStore()
+const uiStore = useUiStore()
+
+//Update breadcrumbs
+uiStore.breadcrumb = [
+    {
+        label: 'Home',
+        icon: 'i-heroicons-queue-list-solid',
+        to: '/'
+    },
+    {
+        label: 'Purchasing',
+        icon: 'i-heroicons-shopping-cart-16-solid'
+    },
+    {
+        label: 'Canvass',
+        icon: 'i-heroicons-clipboard-document-list',
+        to: '/purchasing/canvass'
+    },
+    {
+        label: 'Form',
+        icon: 'i-heroicons-pencil-square-16-solid'
+    }
+]
 
 //state
 const formMode = ref(route.params.action === 'add' ? FORM_MODE.ADD : FORM_MODE.EDIT)
@@ -144,7 +169,7 @@ const canvassData = computed(():Canvass => {
   return {} as Canvass
 })
 
-const rcNumber = useState<string>('rcNumber',() => formMode.value === FORM_MODE.ADD ? useIncrementStringKey(canvassStore.getLastCanvass().rc_number) : canvassData.value.rc_number)
+const rcNumber = useState<string>('rcNumber',() => canvassStore.currentCanvass.rc_number)
 const selectedDate = useState<string>('selectedDate',() => formMode.value === FORM_MODE.EDIT ? canvassData.value.date : '')
 const requisitioners = ['Pastor, Anna Maria L.', 'Ricaflor, Suan', 'Sanico, Marlon','Inclino, William Jay I.']
 const selectedRequisitioner = ref<string>(formMode.value === FORM_MODE.EDIT ? canvassData.value.requisitioner : '')
@@ -209,19 +234,16 @@ function validateCanvassForm():boolean {
   let formDetailsHasError:boolean = false
   let particularsHasError:boolean = false
   //Check details form
-  if (!rcNumber.value || rcNumber.value === '') {
+  if (!canvassStore.currentCanvass.date || canvassStore.currentCanvass.date === '') {
     formDetailsHasError = true
   }
-  if (!selectedDate.value || selectedDate.value === '') {
+  if (!canvassStore.currentCanvass.requisitioner || canvassStore.currentCanvass.requisitioner === '') {
     formDetailsHasError = true
   }
-  if (!selectedRequisitioner.value || selectedRequisitioner.value === '') {
+  if (!canvassStore.currentCanvass.notedby || canvassStore.currentCanvass.notedby === '') {
     formDetailsHasError = true
   }
-  if (!selectedApprover.value || selectedApprover.value === '') {
-    formDetailsHasError = true
-  }
-  if (!purpose.value || purpose.value === '') {
+  if (!canvassStore.currentCanvass.purpose || canvassStore.currentCanvass.purpose === '') {
     formDetailsHasError = true
   }
 
@@ -231,16 +253,18 @@ function validateCanvassForm():boolean {
   }
 
   //check particulars
-  if (particulars.value.length <= 0) {
+  if (!particulars.value || particulars.value.length <= 0) {
     particularsHasError = true
+    console.log("Particulars is empty")
   }else{
     const isParticularItemInvalid = particulars.value.find(pa => 
-      !pa.brand || !pa.description || !pa.quantity || !pa.unit
+      !pa.description || !pa.quantity || !pa.unit
     )
 
     if (isParticularItemInvalid) {
       particularsHasError = true
     }
+    console.log("Particular item has incomplete forms")
   }
 
   if (particularsHasError) {
@@ -250,26 +274,32 @@ function validateCanvassForm():boolean {
   return true
 }
 
-function onSaveCanvass() {
+/**
+ * Perform POST request inside this method
+ */
+async function onSaveCanvass() {
   const isFormValid = validateCanvassForm()
   if (isFormValid) {
-    const canvass:Canvass = {
-      rc_number: rcNumber.value,
-      requisitioner: selectedRequisitioner.value,
-      date: selectedDate.value,
-      notedby:selectedApprover.value,
-      purpose:purpose.value,
-      notes:notes.value,
-      particulars: particulars.value
-    }
+    canvassStore.currentCanvass.particulars = particulars.value
+    const canvass:Canvass = {...canvassStore.currentCanvass}
 
     canvassStore.canvassRecords.push(canvass)
+    
+    //Reset current canvass
+    // canvassStore.currentCanvass = {
+    //   rc_number: '',
+    //     requisitioner: '',
+    //     date: '',
+    //     notedby: '',
+    //     purpose: '',
+    //     particulars: []
+    // }
     toast.add({
             title: 'Canvass successfuly added',
             icon: 'i-heroicons-check-circle-20-solid'
         })
     navigateTo({
-      path: '/purchasing/canvass'
+      path: '/purchasing/canvass/form/success'
     })
   }else{
     isErrorModalActive.value = true
