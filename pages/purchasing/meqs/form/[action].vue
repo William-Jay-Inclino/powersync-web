@@ -114,8 +114,12 @@
                             <UInput type="number"  v-model="row.quantity"/>
                           </UFormGroup>
                         </template>
-                        <template #[]>
-
+                        <template #suppliers-data="{ row }">
+                          <div class="flex flex-row gap-1" v-if="row.suppliers">
+                            <UFormGroup v-for="supplier in row.suppliers" :label="supplier">
+                              <UInput type="number"/>
+                            </UFormGroup>
+                          </div>
                         </template>
                         <template #action-data="{ row }">
                             <UButton color="red" variant="ghost" icon="i-heroicons-trash-16-solid" @click="onDeleteItem"/>
@@ -132,6 +136,7 @@
             </div>
           </template>
         </UTabs>
+        <UNotifications/>
         </UContainer>
     </div>
 </template>
@@ -170,7 +175,8 @@ uiStore.breadcrumb = [
     },
     {
         label: 'MEQS',
-        icon: 'i-heroicons-table-cells-solid'
+        icon: 'i-heroicons-table-cells-solid',
+        to: '/purchasing/meqs'
     },
     {
         label: 'Form',
@@ -217,6 +223,7 @@ const transactionNumbers = canvassStore.canvassRecords.map(cvs => cvs.rc_number)
 const selectedTransactionNumber = useState<string>('selectedTransactionNumber')
 const isDeleteModalActive = useState('isDeleteModalActive', () => false)
 const selectedActionItem = useState<Meqs>('selectedActionItem')
+const particularsHasSupplier = useState<boolean>('particularsHasSupplier',() => false)
 
 //Mock data only
 const approvers = [
@@ -259,21 +266,36 @@ async function onDeleteItem() {
 }
 
 function onAddSupplier(supplier:string) {
+  console.log("onAddSupplier ", supplier)
   if (supplier) {
-    const isSupplierAlreadyAdded = particularsColumn.value.find(part => part.label === supplier)
+    const isSupplierColumnExists = particularsColumn.value.find(part => part.key === 'suppliers')
+
+    if (!isSupplierColumnExists) {
+      particularsColumn.value.splice(4,0,{
+        key: 'suppliers',
+        label: 'Suppliers'
+      })
+    }
+
+    if (!meqsParticulars.value) {
+      console.error("meqsParticulars isn undefined")
+      return
+    }
+    const isSupplierAlreadyAdded = meqsParticulars.value[0].suppliers?.find(sup => sup === supplier)
+
     if (isSupplierAlreadyAdded) {
       toast.add({
-        title: 'This supplier has already been added',
-        icon: 'i-heroicons-x-mark-16-solid'
-      })
+            title: 'This supplier has already been added',
+            icon: 'i-heroicons-x-mark-16-solid'
+        })
       return
     }
 
-    const key = `supplier_${supplier.toLocaleLowerCase()}`
-    
-    particularsColumn.value.splice(4,0,{
-      key: key,
-      label: supplier
+    meqsParticulars.value.forEach((part:CanvassItem) => {
+      if (!part.suppliers) {
+        part.suppliers = []
+      }
+      part.suppliers.push(supplier)
     })
 
     toast.add({

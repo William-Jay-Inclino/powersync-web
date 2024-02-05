@@ -22,6 +22,7 @@ export interface CanvassItem {
     brand: string
     unit: string
     quantity: number
+    suppliers?: Array<string>
 }
 
 export interface Breadcrumb {
