@@ -1,6 +1,5 @@
 <template>
     <div>
-        
         <UContainer>
           <UCard class="mt-4">
             <div class="flex justify-between">
