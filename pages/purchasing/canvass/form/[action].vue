@@ -171,7 +171,7 @@ const formErrorMessage = useState('formErrorMessage')
 
 
 const columns = [{
-  key: 'number',
+  key: 'id',
   label: 'No.'
 }, {
   key: 'description',
@@ -195,7 +195,7 @@ const units:Array<string> = ['Pieces','Cartons','Pallets']
 //Mock table data
 const particulars = ref<Array<CanvassItem>>(formMode.value === FORM_MODE.ADD ? 
   [
-  {number: 1,description: '',brand: '',unit:'',quantity: 0}
+  {id: 1,description: '',brand: '',unit:'',quantity: 0}
   ] :
   canvassData.value.particulars ? canvassData.value.particulars : []
   )
@@ -204,7 +204,7 @@ const particulars = ref<Array<CanvassItem>>(formMode.value === FORM_MODE.ADD ?
 function onAddItem() {
   const lastRecord = particulars.value[particulars.value.length - 1]
   const newItem:CanvassItem = {
-    number: lastRecord.number++,
+    id: lastRecord.id++,
     description: '',
     brand: '',
     unit: '',
@@ -274,15 +274,6 @@ async function onSaveCanvass() {
 
     canvassStore.canvassRecords.push(canvass)
     
-    //Reset current canvass
-    // canvassStore.currentCanvass = {
-    //   rc_number: '',
-    //     requisitioner: '',
-    //     date: '',
-    //     notedby: '',
-    //     purpose: '',
-    //     particulars: []
-    // }
     toast.add({
             title: 'Canvass successfuly added',
             icon: 'i-heroicons-check-circle-20-solid'

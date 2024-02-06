@@ -17,12 +17,13 @@ export interface Canvass {
 }
 
 export interface CanvassItem {
-    number: number
+    id: number
+    canvass_id?: string
     description: string
     brand: string
     unit: string
     quantity: number
-    suppliers?: Array<string>
+    suppliers?: Array<Supplier>
 }
 
 export interface Breadcrumb {
@@ -59,6 +60,26 @@ export interface MeqsSupplierAttachment {
     src: string
 }
 
+export interface MeqsSupplierItem {
+    id: number
+    meqs_supplier_id: number | undefined
+    meqs_supplier_name: string | undefined
+    canvass_item_id: number
+    canvass_description: string | undefined
+    price?: number
+    notes: string
+    is_awarded: boolean
+    is_accepted?: boolean
+    vat_type?: VAT_TYPE | string
+}
+
+export interface Supplier {
+    id: number
+    name: string
+    contact?: string
+    is_awarded?: boolean
+}
+
 export const enum FORM_MODE { 
     ADD = 'ADD',
     EDIT = 'EDIT'
@@ -75,4 +96,10 @@ export const enum APPROVAL_STATUS {
     APPROVED = 'approved',
     DISAPPROVED = 'disapproved',
     CANCELLED = 'cancelled'
+}
+
+export const enum VAT_TYPE {
+    NONE = 'none',
+    INC = 'Inc',
+    EXC = 'Exc'
 }

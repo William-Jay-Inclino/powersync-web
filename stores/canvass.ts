@@ -15,7 +15,7 @@ export const useCanvassStore = defineStore('canvass', () => {
     const canvassRecords = ref<Array<Canvass>>([
         { rc_number: "24-00015", requisitioner: "Inclino, William Jay I.", date: "2024-01-12", notedby: 'Pastor, Anna Maria L.', purpose: 'Testing',
         particulars: [{
-            number: 1,
+            id: 1,
             description: 'Canned Tuna',
             brand: 'Brand X',
             unit: 'Cartons',
@@ -23,7 +23,7 @@ export const useCanvassStore = defineStore('canvass', () => {
         }]},
         { rc_number: "24-00016", requisitioner: "Pastor, Anna Maria L.", date: "2024-01-12", notedby: 'Inclino, William Jay I.', purpose: 'Order',
         particulars: [{
-            number: 1,
+            id: 1,
             description: 'Soap',
             brand: 'Brand Y',
             unit: 'Cartons',
