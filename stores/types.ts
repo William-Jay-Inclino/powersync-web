@@ -78,6 +78,8 @@ export interface Supplier {
     name: string
     contact?: string
     is_awarded?: boolean
+    attachments?: Array<File>
+    price?: number
 }
 
 export const enum FORM_MODE { 

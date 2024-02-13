@@ -1,163 +1,252 @@
 <template>
     <div>
         <UContainer>
-        <UTabs :items="tabItems" class="mt-2">
+        <UTabs v-model="currentStepperItem" :items="stepperItems" class="w-full mt-2">
           <template #default="{ item, index, selected }">
             <div class="flex items-center gap-2 relative truncate">
               <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
 
-              <span class="truncate">{{ item.label }}</span>
+              <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
+
+              <span v-if="selected" class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
             </div>
           </template>
           <template #item="{ item }">
-            <div v-if="item.label === 'MEQS Form'">
-              <UCard class="mt-4">
-                <div class="flex justify-between">
-                  <h1 class=" text-xl font-bold mt-2">MEQS</h1>
-                  <div class="flex gap-2">
-                    <UButton
-                      icon="i-heroicons-printer-solid"
-                      size="sm"
-                      color="yellow"
-                      variant="outline"
-                      label="Print"
-                      :trailing="false"
-                    />
-                    <UButton
-                      icon="i-heroicons-check-circle-20-solid"
-                      size="sm"
-                      color="blue"
-                      variant="solid"
-                      label="Save"
-                      :trailing="false"
-                    />
-                  </div>
+            <UCard class="mt-4">
+              <div class="flex justify-between">
+                <UButton
+                  icon="i-heroicons-arrow-left-16-solid"
+                  size="sm"
+                  color="cyan"
+                  variant="ghost"
+                  label="Previous"
+                  :trailing="false"
+                  :disabled="currentStepperItem === 0"
+                  @click="onToggleTab('previous')"
+                />
+                <div class="flex gap-2">
+                  <UButton
+                    icon="i-heroicons-check-circle-20-solid"
+                    size="sm"
+                    color="blue"
+                    variant="solid"
+                    label="Save"
+                    :trailing="false"
+                    v-if="currentStepperItem === 4"
+                  />
+                  <UButton
+                    icon="i-heroicons-arrow-right-16-solid"
+                    size="sm"
+                    color="blue"
+                    variant="solid"
+                    label="Next"
+                    :trailing="false"
+                    v-else-if="currentStepperItem !== 4"
+                    @click="onToggleTab('next')"
+                  />
                 </div>
-              </UCard>
-              <div class="flex flex-col md:flex-row gap-4 md:mt-2">
-                  <UCard>
-                    <template #header>
-                      <h1 class="font-bold">Details</h1>
-                    </template>
-                    <div class="flex flex-col gap-4">
-                        <UFormGroup label="MEQS Number">
-                            <USelect v-model="selectedMeqs" :options="meqsNumbers" placeholder="Select MEQS..."/>
-                        </UFormGroup>
-                        <UFormGroup label="Date">
-                                <UInput type="date" v-model="selectedDate" placeholder="Select date..."/>
-                        </UFormGroup>
-                        <div class="flex flex-row gap-1">
-                          <UFormGroup label="Type">
-                              <USelect
-                                  v-model="selectedTransactionType"
-                                  :options="transactionTypes"
-                                  placeholder="Select..."
-                                  color="blue"
-                              >
-                              </USelect>
-                          </UFormGroup>
-                          <UFormGroup label="Transaction">
-                              <USelect
-                                  v-model="selectedTransactionNumber"
-                                  :options="transactionNumbers"
-                                  placeholder="Select..."
-                              >
-                              </USelect>
-                          </UFormGroup>
-                        </div>
-                        <UFormGroup label="Requisitioner">
-                            <USelect v-model="selectedRequisitioner" :options="requisitioners" />
-                        </UFormGroup>
-                    </div>
-                  </UCard>
-                  <div class="flex flex-col w-full">
-                    <UCard class="w-full">
-                      <template #header>
-                        <div class="flex flex-col md:flex-row md:justify-between items-center">
-                          <h1 class="font-bold">Particulars and Unit Cost per Item</h1>
-                          <div class="flex gap-1">
-                            <UDropdown :items="supplierDropdownItems" :popper="{ placement: 'bottom-start' }">
-                              <UButton color="cyan" label="Add Supplier" trailing-icon="i-heroicons-chevron-down-20-solid" />
-                            </UDropdown>
-                            <UButton
-                                icon="i-heroicons-plus-circle"
-                                size="md"
-                                color="blue"
-                                variant="solid"
-                                label="Add item"
-                                @click="onAddItem"
-                            />
-                          </div>
-                        </div>
-                      </template>
-                      <UTable :rows="meqsParticulars" :columns="particularsColumn">
-                          <template #description-data="{ row }">
-                            <UFormGroup :error="!row.description && 'Invalid description'">
-                              <UInput v-model="row.description" placeholder="Enter description"/>
-                            </UFormGroup>
+              </div>
+            </UCard>
+            <div v-if="item.label === 'MEQS Details'">
+              <UTabs :items="tabItems" class="mt-2">
+                <template #default="{ item, index, selected }">
+                  <div class="flex items-center gap-2 relative truncate">
+                    <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
+
+                    <span class="truncate">{{ item.label }}</span>
+                  </div>
+                </template>
+                <template #item="{ item }">
+                  <div v-if="item.label === 'MEQS Form'">
+                    <div class="flex justify-center md:mt-2">
+                        <UCard>
+                          <template #header>
+                            <h1 class="font-bold">Details</h1>
                           </template>
-                          <template #brand-data="{ row }">
-                              <USelect v-model="row.brand" :options="brands" />
-                          </template>
-                          <template #unit-data="{ row }">
-                            <UFormGroup :error="!row.unit && 'Invalid unit'">
-                              <USelect v-model="row.unit" :options="units" />
-                            </UFormGroup>
-                          </template>
-                          <template #quantity-data="{ row }">
-                            <UFormGroup :error="!row.quantity && 'Invalid quantity'">
-                              <UInput type="number"  v-model="row.quantity"/>
-                            </UFormGroup>
-                          </template>
-                          <template #suppliers-data="{ row }">
-                            <div class="flex flex-row gap-2 md:gap-1" v-if="row.suppliers">
-                              <UFormGroup v-for="supplier in row.suppliers" :label="supplier.name">
-                                <template #hint>
-                                  <UToggle
-                                    size="sm"
-                                    color="yellow"
-                                    on-icon="i-heroicons-star-16-solid"
-                                    off-icon="i-heroicons-star"
-                                    :model-value="supplier.is_awarded"
-                                    @click="onAwardSupplier(row,supplier)"
-                                  />
-                                </template>
-                                <template #default>
-                                  <UInput type="number"/>
-                                </template>
+                          <div class="flex flex-col gap-4">
+                              <UFormGroup label="MEQS Number">
+                                  <USelect v-model="selectedMeqs" :options="meqsNumbers" placeholder="Select MEQS..."/>
                               </UFormGroup>
-                            </div>
-                          </template>
-                          <template #action-data="{ row }">
-                              <UButton color="red" variant="ghost" icon="i-heroicons-trash-16-solid" @click="onDeleteItem(row)"/>
-                          </template>
-                      </UTable>
-                    </UCard>
-                    <UCard class="w-full mt-4">
-                      <template #header>
-                        <h1 class="font-bold">Award to which supplier the item will be purchased</h1>
-                      </template>
-                      <UTable :rows="meqsSupplierItems" :columns="meqsSupplierColumns">
-                        <template #meqs_supplier_id-data="{ row }">
-                          <USelect v-if="row.meqs_supplier_id" v-model="row.meqs_supplier_name" :options="supplierStore.supplierRecords.map(s => s.name)" />
-                        </template>
-                        <template #notes-data="{ row }">
-                          <UTextarea v-model="row.notes" />
-                        </template>
-                      </UTable>
+                              <UFormGroup label="Date">
+                                      <UInput type="date" v-model="selectedDate" placeholder="Select date..."/>
+                              </UFormGroup>
+                              <div class="flex flex-row gap-1">
+                                <UFormGroup label="Type">
+                                    <USelect
+                                        v-model="selectedTransactionType"
+                                        :options="transactionTypes"
+                                        placeholder="Select..."
+                                        color="blue"
+                                    >
+                                    </USelect>
+                                </UFormGroup>
+                                <UFormGroup label="Transaction">
+                                    <USelect
+                                        v-model="selectedTransactionNumber"
+                                        :options="transactionNumbers"
+                                        placeholder="Select..."
+                                    >
+                                    </USelect>
+                                </UFormGroup>
+                              </div>
+                              <UFormGroup label="Requisitioner">
+                                  <USelect v-model="selectedRequisitioner" :options="requisitioners" />
+                              </UFormGroup>
+                          </div>
+                        </UCard>
+                    </div>
+                  </div>
+                  <div v-else-if="item.label === 'Approvers'">
+                    <UCard class="mt-4">
+                      <h1 class="font-bold">Approvers</h1>
+                      <UTable :rows="approvers" />
                     </UCard>
                   </div>
-              </div>
+                </template>
+              </UTabs>
             </div>
-            <div v-else-if="item.label === 'Approvers'">
-              <UCard class="mt-4">
-                <h1 class="font-bold">Approvers</h1>
-                <UTable :rows="approvers" />
+            <div v-else-if="item.label === 'Add Suppliers'">
+              <UCard class="mt-2">
+                <template #header>
+                  <div class="flex justify-end">
+                    <UDropdown :items="supplierDropdownItems" :popper="{ placement: 'bottom-start' }">
+                          <UButton color="cyan" label="Add Supplier" trailing-icon="i-heroicons-chevron-down-20-solid" />
+                    </UDropdown>
+                  </div>
+                </template>
+                <UTable :columns="supplierColumn" :rows="supplierRows">
+                  <template #attachments-data="{ row }">
+                    <file-pond
+                      :name="`${row.supplier}_filepond`"
+                      label-idle="Drop files here..."
+                      v-bind:allow-multiple="true"
+                      accepted-file-types="image/jpeg, image/png"
+                      v-bind:files="row.attachments"
+                    />
+                  </template>
+                  <template #action-data="{ row }">
+                    <UButton color="red" variant="ghost" icon="i-heroicons-trash-16-solid" @click="onDeleteSupplier(row)"/>
+                  </template>
+                </UTable>
               </UCard>
+            </div>
+            <div v-else-if="item.label === 'Particulars and Unit Cost'">
+              <UCard class="w-full">
+                <template #header>
+                  <div class="flex flex-col md:flex-row md:justify-between items-center">
+                    <h1 class="font-bold">Particulars and Unit Cost per Item</h1>
+                    <div class="flex gap-1">
+                      <UDropdown :items="supplierDropdownItems" :popper="{ placement: 'bottom-start' }">
+                        <UButton color="cyan" label="Add Supplier" trailing-icon="i-heroicons-chevron-down-20-solid" />
+                      </UDropdown>
+                      <UButton
+                          icon="i-heroicons-plus-circle"
+                          size="md"
+                          color="blue"
+                          variant="solid"
+                          label="Add item"
+                          @click="onAddItem"
+                      />
+                    </div>
+                  </div>
+                </template>
+                <UTable :rows="meqsParticulars" :columns="particularsColumn">
+                    <template #description-data="{ row }">
+                      <UFormGroup :error="!row.description && 'Invalid description'">
+                        <UInput v-model="row.description" placeholder="Enter description"/>
+                      </UFormGroup>
+                    </template>
+                    <template #brand-data="{ row }">
+                        <USelect v-model="row.brand" :options="brands" />
+                    </template>
+                    <template #unit-data="{ row }">
+                      <UFormGroup :error="!row.unit && 'Invalid unit'">
+                        <USelect v-model="row.unit" :options="units" />
+                      </UFormGroup>
+                    </template>
+                    <template #quantity-data="{ row }">
+                      <UFormGroup :error="!row.quantity && 'Invalid quantity'">
+                        <UInput type="number"  v-model="row.quantity"/>
+                      </UFormGroup>
+                    </template>
+                    <template #suppliers-data="{ row }">
+                      <div class="flex flex-row gap-2 md:gap-1" v-if="row.suppliers">
+                        <UFormGroup v-for="supplier in row.suppliers" :label="supplier.name">
+                          <template #hint>
+                            <UToggle
+                              size="sm"
+                              color="yellow"
+                              on-icon="i-heroicons-star-16-solid"
+                              off-icon="i-heroicons-star"
+                              :model-value="supplier.is_awarded"
+                              @click="onAwardSupplier(row,supplier)"
+                            />
+                          </template>
+                          <template #default>
+                            <UInput type="number" v-model="supplier.price"/>
+                          </template>
+                        </UFormGroup>
+                      </div>
+                    </template>
+                    <template #action-data="{ row }">
+                        <UButton color="red" variant="ghost" icon="i-heroicons-trash-16-solid" @click="onToggleDeleteModal(row)"/>
+                    </template>
+                </UTable>
+              </UCard>
+            </div>
+            <div v-else-if="item.label === 'Award Supplier'">
+              <UCard class="w-full mt-4">
+                <template #header>
+                  <h1 class="font-bold">Award to which supplier the item will be purchased</h1>
+                </template>
+                <UTable :rows="meqsSupplierItems" :columns="meqsSupplierColumns">
+                  <template #meqs_supplier_id-data="{ row }">
+                    <USelect v-if="row.meqs_supplier_id" v-model="row.meqs_supplier_name" :options="supplierStore.supplierRecords.map(s => s.name)" />
+                  </template>
+                  <template #notes-data="{ row }">
+                    <UFormGroup label="Notes">
+                      <UTextarea v-model="row.notes" />
+                    </UFormGroup>
+                  </template>
+                </UTable>
+              </UCard>
+            </div>
+            <div v-else-if="item.label === 'Review Details'">
+
             </div>
           </template>
         </UTabs>
         <UNotifications/>
+        <UModal v-model="isDeleteModalActive">
+            <UCard>
+                <div class="flex flex-col gap-4 justify-center items-center">
+                    <UIcon name="i-heroicons-exclamation-triangle-solid" class="text-6xl text-red-600"/>
+                    <h1 class="font-bold text-xl">Delete Canvass Item</h1>
+                    <p>Are you sure you want to delete canvass item with <b>Item number {{ selectedCanvassItem.id }}</b>?</p>
+                </div>
+                <template #footer>
+                    <div class="flex justify-between md:justify-end items-center gap-2">
+                        <UButton
+                            size="md"
+                            color="blue"
+                            variant="ghost"
+                            label="Cancel"
+                            :trailing="false"
+                            @click="isDeleteModalActive = !isDeleteModalActive"
+                        />
+                        <UButton
+                            icon="i-heroicons-trash-16-solid"
+                            size="md"
+                            color="red"
+                            variant="solid"
+                            label="Delete"
+                            :trailing="false"
+                            @click="onDeleteItem"
+                        />
+                    </div>
+                </template>
+            </UCard>
+        </UModal>
         </UContainer>
     </div>
 </template>
@@ -167,9 +256,21 @@ import { useMeqsStore } from '~/stores/meqs'
 import { useCanvassStore } from '~/stores/canvass';
 import { useSupplierStore } from '~/stores/supplier'
 import { stringContains } from '~/utils'
-import type { Meqs, MeqsSupplierItem, Supplier } from '~/stores/types'
+import type { CanvassItem, Meqs, MeqsSupplierItem, Supplier } from '~/stores/types'
 import { APPROVAL_STATUS } from '~/stores/types'
 import { sub } from 'date-fns';
+import vueFilePond from "vue-filepond"
+import "filepond/dist/filepond.min.css";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
+
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+
+const FilePond = vueFilePond(
+  FilePondPluginFileValidateType,
+  FilePondPluginImagePreview
+);
+
 definePageMeta({
     layout: 'dashboard-default'
 })
@@ -177,6 +278,8 @@ definePageMeta({
 onMounted(async () => {
     //useFetch should be used here to fetch data from db
 })
+
+
 
 const meqsStore = useMeqsStore()
 const canvassStore = useCanvassStore()
@@ -206,12 +309,42 @@ uiStore.breadcrumb = [
     }
 ]
 
+const stepperItems = ref([{
+  label: 'MEQS Details',
+  icon: 'i-heroicons-information-circle'
+},{
+  label: 'Add Suppliers',
+  icon: 'i-heroicons-building-storefront-solid'
+},{
+  label: 'Particulars and Unit Cost',
+  icon: 'i-heroicons-cube-20-solid'
+},{
+  label: 'Award Supplier',
+  icon: 'i-heroicons-star-20-solid'
+},{
+  label: 'Review Details',
+  icon: 'i-heroicons-document-magnifying-glass-16-solid'
+}])
+
 const tabItems = [{
   label: 'MEQS Form',
   icon: 'i-heroicons-information-circle'
 }, {
   label: 'Approvers',
   icon: 'i-heroicons-user-group-20-solid'
+}]
+
+const supplierColumn = [{
+  key: 'id',
+  label: 'ID'
+},{
+  key: 'name',
+  label: 'Supplier'
+},{
+  key: 'attachments',
+  label: 'Attachments'
+},{
+  key: 'action'
 }]
 
 const particularsColumn = ref([{
@@ -259,7 +392,9 @@ const transactionNumbers = canvassStore.canvassRecords.map(cvs => cvs.rc_number)
 const selectedTransactionNumber = useState<string>('selectedTransactionNumber')
 const isDeleteModalActive = useState('isDeleteModalActive', () => false)
 const selectedActionItem = useState<Meqs>('selectedActionItem')
+const selectedCanvassItem = useState<CanvassItem>('selectedCanvassItem')
 const particularsHasSupplier = useState<boolean>('particularsHasSupplier',() => false)
+const currentStepperItem = useState('currentStepperItem', () => 0)
 
 //Mock data only
 const approvers = [
@@ -326,6 +461,8 @@ const meqsSupplierItems = computed(() => {
   return []
 })
 
+const supplierRows = ref<Array<Supplier>>([])
+
 //methods
 function onAddItem() {
   if (!meqsParticulars.value) {
@@ -348,12 +485,26 @@ function onAddItem() {
   meqsParticulars.value.splice(meqsParticulars.value.length - 1,0,newItem)
 }
 
-async function onDeleteItem(item:CanvassItem) {
+function onToggleDeleteModal(supplierItem:CanvassItem){
+  if(!supplierItem) {
+    console.error("supplierItem is undefined")
+    return
+  }
+  selectedCanvassItem.value = supplierItem
+  isDeleteModalActive.value = !isDeleteModalActive.value
+}
+
+async function onDeleteItem() {
   if (!meqsParticulars.value) {
     console.error("meqsParticulars.value is undefined")
     return
   }
-  const index  = meqsParticulars.value.indexOf(item)
+
+  if (!selectedCanvassItem.value) {
+    console.error("selectedCanvassItem.value is undefined")
+    return
+  }
+  const index = meqsParticulars.value.indexOf(selectedCanvassItem.value)
   meqsParticulars.value.splice(index,1)
 }
 
@@ -383,6 +534,14 @@ function onAddSupplier(supplier:Supplier) {
       return
     }
 
+    //Add to supplier table in second tab
+    supplierRows.value.push({
+      id: supplier.id,
+      name: supplier.name,
+      attachments: []
+    })
+
+    //Add supplier to canvass item table in third tab
     meqsParticulars.value.forEach((part:CanvassItem,index) => {
       if (!part.suppliers) {
         part.suppliers = []
@@ -399,6 +558,30 @@ function onAddSupplier(supplier:Supplier) {
             icon: 'i-heroicons-check-circle-20-solid'
         })
     return
+  }
+}
+
+function onDeleteSupplier(supplier:Supplier){
+  if (supplier) {
+    const index = supplierRows.value.indexOf(supplier)
+
+    //Remove from suppliers table
+    supplierRows.value.splice(index,1)
+
+    //Remove from canvass items table
+    let supplierParticularIndex:number
+    if (meqsParticulars.value) {
+      meqsParticulars.value.forEach((part,index) => {
+        if (part.suppliers) {
+          if(!supplierParticularIndex){
+            supplierParticularIndex = part.suppliers.indexOf(supplier)
+          }else{
+            part.suppliers.splice(supplierParticularIndex,1)
+          }
+        }
+      })
+    }
+
   }
 }
 
@@ -438,6 +621,15 @@ function getSelectedSupplierNameById(id:number):string {
     return supplier.name
   }
   return ''
+}
+
+function onToggleTab(action:string = 'next') {
+
+  if (action === 'next') {
+    currentStepperItem.value++
+    return
+  }
+  currentStepperItem.value--
 }
 
 </script>
