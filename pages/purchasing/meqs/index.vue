@@ -148,6 +148,7 @@ const selectedTransactionNumber = useState<string>('selectedTransactionNumber')
 const isDeleteModalActive = useState('isDeleteModalActive', () => false)
 const selectedActionItem = useState<Meqs>('selectedActionItem')
 
+
 const columns = [{
   key: 'meqs_number',
   label: 'MEQS number'

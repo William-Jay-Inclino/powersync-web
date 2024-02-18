@@ -1,7 +1,13 @@
 <template>
     <div>
         <UContainer>
-        <UTabs v-model="currentStepperItem" :items="stepperItems" class="w-full mt-2">
+        <UTabs v-model="currentStepperItem" :items="stepperItems" class="w-full mt-2" :ui="{
+          list:{
+            tab: {
+              active: 'bg-yellow-500 text-slate-800 font-bold'
+            }
+          }
+        }">
           <template #default="{ item, index, selected }">
             <div class="flex items-center gap-2 relative truncate">
               <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
@@ -12,41 +18,6 @@
             </div>
           </template>
           <template #item="{ item }">
-            <UCard class="mt-4">
-              <div class="flex justify-between">
-                <UButton
-                  icon="i-heroicons-arrow-left-16-solid"
-                  size="sm"
-                  color="cyan"
-                  variant="ghost"
-                  label="Previous"
-                  :trailing="false"
-                  :disabled="currentStepperItem === 0"
-                  @click="onToggleTab('previous')"
-                />
-                <div class="flex gap-2">
-                  <UButton
-                    icon="i-heroicons-check-circle-20-solid"
-                    size="sm"
-                    color="blue"
-                    variant="solid"
-                    label="Save"
-                    :trailing="false"
-                    v-if="currentStepperItem === 4"
-                  />
-                  <UButton
-                    icon="i-heroicons-arrow-right-16-solid"
-                    size="sm"
-                    color="blue"
-                    variant="solid"
-                    label="Next"
-                    :trailing="false"
-                    v-else-if="currentStepperItem !== 4"
-                    @click="onToggleTab('next')"
-                  />
-                </div>
-              </div>
-            </UCard>
             <div v-if="item.label === 'MEQS Details'">
               <UTabs :items="tabItems" class="mt-2">
                 <template #default="{ item, index, selected }">
@@ -109,20 +80,13 @@
               <UCard class="mt-2">
                 <template #header>
                   <div class="flex justify-end">
-                    <UDropdown :items="supplierDropdownItems" :popper="{ placement: 'bottom-start' }">
-                          <UButton color="cyan" label="Add Supplier" trailing-icon="i-heroicons-chevron-down-20-solid" />
-                    </UDropdown>
+                    <UButton color="blue" label="Add Supplier" trailing-icon="i-heroicons-plus-circle" @click="onToggleAddSupplierModal"/>
                   </div>
                 </template>
                 <UTable :columns="supplierColumn" :rows="supplierRows">
                   <template #attachments-data="{ row }">
-                    <file-pond
-                      :name="`${row.supplier}_filepond`"
-                      label-idle="Drop files here..."
-                      v-bind:allow-multiple="true"
-                      accepted-file-types="image/jpeg, image/png"
-                      v-bind:files="row.attachments"
-                    />
+                    <!-- <UButton :color="row.attachments ? 'primary' : 'cyan'" variant="soft" @click="onToggleViewFilesModal(row.attachments)">{{ row.attachments ? `View ${row.attachments.length} files` : 'No files' }}</UButton> -->
+                    <UBadge :color="row.attachments ? 'primary' : 'cyan'" variant="soft">{{ row.attachments ? `${row.attachments.length} attachment${row.attachments.length > 1 ? 's' : ''}` : 'No files' }}</UBadge>
                   </template>
                   <template #action-data="{ row }">
                     <UButton color="red" variant="ghost" icon="i-heroicons-trash-16-solid" @click="onDeleteSupplier(row)"/>
@@ -139,14 +103,6 @@
                       <UDropdown :items="supplierDropdownItems" :popper="{ placement: 'bottom-start' }">
                         <UButton color="cyan" label="Add Supplier" trailing-icon="i-heroicons-chevron-down-20-solid" />
                       </UDropdown>
-                      <UButton
-                          icon="i-heroicons-plus-circle"
-                          size="md"
-                          color="blue"
-                          variant="solid"
-                          label="Add item"
-                          @click="onAddItem"
-                      />
                     </div>
                   </div>
                 </template>
@@ -214,38 +170,154 @@
             <div v-else-if="item.label === 'Review Details'">
 
             </div>
+            <UCard class="mt-4">
+              <div class="flex justify-between">
+                <UButton
+                  icon="i-heroicons-arrow-left-16-solid"
+                  size="sm"
+                  color="cyan"
+                  variant="ghost"
+                  label="Previous"
+                  :trailing="false"
+                  :disabled="currentStepperItem === 0"
+                  @click="onToggleTab('previous')"
+                />
+                <div class="flex gap-2">
+                  <UButton
+                    icon="i-heroicons-check-circle-20-solid"
+                    size="sm"
+                    color="blue"
+                    variant="solid"
+                    label="Save"
+                    :trailing="false"
+                    v-if="currentStepperItem === 4"
+                  />
+                  <UButton
+                    icon="i-heroicons-arrow-right-16-solid"
+                    size="sm"
+                    color="blue"
+                    variant="solid"
+                    label="Next"
+                    :trailing="false"
+                    v-else-if="currentStepperItem !== 4"
+                    :disabled="isNextButtonDisabled"
+                    @click="onToggleTab('next')"
+                  />
+                </div>
+              </div>
+            </UCard>
           </template>
         </UTabs>
         <UNotifications/>
         <UModal v-model="isDeleteModalActive">
-            <UCard>
-                <div class="flex flex-col gap-4 justify-center items-center">
-                    <UIcon name="i-heroicons-exclamation-triangle-solid" class="text-6xl text-red-600"/>
-                    <h1 class="font-bold text-xl">Delete Canvass Item</h1>
-                    <p>Are you sure you want to delete canvass item with <b>Item number {{ selectedCanvassItem.id }}</b>?</p>
+          <UCard>
+            <div class="flex flex-col gap-4 justify-center items-center">
+                <UIcon name="i-heroicons-exclamation-triangle-solid" class="text-6xl text-red-600"/>
+                <h1 class="font-bold text-xl">Delete Canvass Item</h1>
+                <p>Are you sure you want to delete canvass item with <b>Item number {{ selectedCanvassItem.id }}</b>?</p>
+            </div>
+            <template #footer>
+              <div class="flex justify-between md:justify-end items-center gap-2">
+                  <UButton
+                      size="md"
+                      color="blue"
+                      variant="ghost"
+                      label="Cancel"
+                      :trailing="false"
+                      @click="isDeleteModalActive = !isDeleteModalActive"
+                  />
+                  <UButton
+                      icon="i-heroicons-trash-16-solid"
+                      size="md"
+                      color="red"
+                      variant="solid"
+                      label="Delete"
+                      :trailing="false"
+                      @click="onDeleteItem"
+                  />
+              </div>
+            </template>
+          </UCard>
+        </UModal>
+        <UModal v-model="isAddSupplierModalActive">
+          <UCard>
+            <div class="flex flex-col justify-center items-stretch gap-2">
+              <UDropdown :items="supplierDropdownItems" :popper="{ placement: 'bottom-start' }">
+                <UButton color="cyan" label="Select Supplier" trailing-icon="i-heroicons-chevron-down-20-solid" />
+              </UDropdown>
+              <div class="bg-sky-500 text-white rounded-lg px-1 py-2 text-center mt-1 mb-1" v-if="selectedSupplier">
+                <div class="flex justify-between items-center">
+                  <div></div>
+                  <div>You selected: <span class="font-bold">{{ selectedSupplier.name }}</span></div>
+                  <!-- @vue-expect-error-->
+                  <UButton
+                    icon="i-heroicons-trash-16-solid"
+                    size="sm"
+                    color="white"
+                    square
+                    variant="soft"
+                    @click="selectedSupplier = undefined"
+                  />
                 </div>
-                <template #footer>
-                    <div class="flex justify-between md:justify-end items-center gap-2">
-                        <UButton
-                            size="md"
-                            color="blue"
-                            variant="ghost"
-                            label="Cancel"
-                            :trailing="false"
-                            @click="isDeleteModalActive = !isDeleteModalActive"
-                        />
-                        <UButton
-                            icon="i-heroicons-trash-16-solid"
-                            size="md"
-                            color="red"
-                            variant="solid"
-                            label="Delete"
-                            :trailing="false"
-                            @click="onDeleteItem"
-                        />
-                    </div>
-                </template>
-            </UCard>
+                
+              </div>
+              <UDivider label="Upload Attachments" v-if="selectedSupplier"/>
+              <file-pond
+                :name="`supplierAttachments`"
+                label-idle="Drop files here..."
+                ref="addSupplierFilepond"
+                v-bind:allow-multiple="true"
+                accepted-file-types="image/jpeg, image/png"
+                @updatefiles="handleFileProcessing"
+                v-if="selectedSupplier"
+              />
+            </div>
+            <template #footer>
+              <div class="flex justify-between md:justify-end items-center gap-2">
+                <UButton
+                      size="md"
+                      color="cyan"
+                      variant="ghost"
+                      label="Cancel"
+                      :trailing="false"
+                      @click="isAddSupplierModalActive = !isAddSupplierModalActive"
+                  />
+                  <UButton
+                      icon="i-heroicons-check-circle-20-solid"
+                      size="md"
+                      color="blue"
+                      variant="solid"
+                      label="Add Supplier"
+                      :trailing="false"
+                      @click="onAddSupplier(selectedSupplier)"
+                  />
+              </div>
+            </template>
+          </UCard>
+        </UModal>
+        <UModal v-model="isFileViewerModalActive">
+          <UCarousel
+            v-slot="{ item }"
+            :items="fileDataUrls"
+            :ui="{
+              item: 'basis-full',
+              container: 'rounded-lg'
+            }"
+            :prev-button="{
+              color: 'gray',
+              icon: 'i-heroicons-arrow-left-20-solid',
+              class: '-left-12'
+            }"
+            :next-button="{
+              color: 'gray',
+              icon: 'i-heroicons-arrow-right-20-solid',
+              class: '-right-12'
+            }"
+            arrows
+            class="w-64 mx-auto"
+          >
+            <img :src="item" class="w-full" draggable="true">
+          </UCarousel>
         </UModal>
         </UContainer>
     </div>
@@ -255,10 +327,7 @@
 import { useMeqsStore } from '~/stores/meqs'
 import { useCanvassStore } from '~/stores/canvass';
 import { useSupplierStore } from '~/stores/supplier'
-import { stringContains } from '~/utils'
 import type { CanvassItem, Meqs, MeqsSupplierItem, Supplier } from '~/stores/types'
-import { APPROVAL_STATUS } from '~/stores/types'
-import { sub } from 'date-fns';
 import vueFilePond from "vue-filepond"
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
@@ -311,19 +380,23 @@ uiStore.breadcrumb = [
 
 const stepperItems = ref([{
   label: 'MEQS Details',
-  icon: 'i-heroicons-information-circle'
+  icon: 'i-heroicons-information-circle',
 },{
   label: 'Add Suppliers',
-  icon: 'i-heroicons-building-storefront-solid'
+  icon: 'i-heroicons-building-storefront-solid',
+  disabled: true
 },{
   label: 'Particulars and Unit Cost',
-  icon: 'i-heroicons-cube-20-solid'
+  icon: 'i-heroicons-cube-20-solid',
+  disabled: true
 },{
   label: 'Award Supplier',
-  icon: 'i-heroicons-star-20-solid'
+  icon: 'i-heroicons-star-20-solid',
+  disabled: true
 },{
   label: 'Review Details',
-  icon: 'i-heroicons-document-magnifying-glass-16-solid'
+  icon: 'i-heroicons-document-magnifying-glass-16-solid',
+  disabled: true
 }])
 
 const tabItems = [{
@@ -395,6 +468,12 @@ const selectedActionItem = useState<Meqs>('selectedActionItem')
 const selectedCanvassItem = useState<CanvassItem>('selectedCanvassItem')
 const particularsHasSupplier = useState<boolean>('particularsHasSupplier',() => false)
 const currentStepperItem = useState('currentStepperItem', () => 0)
+const selectedSupplier = useState<Supplier>('selectedSupplier')
+const selectedSupplierAttachments = useState<Array<File>>('selectedSupplierAttachments', () => [])
+const addSupplierFilepond = useState('addSupplierFilepond')
+const isAddSupplierModalActive = useState<boolean>('isAddSupplierModalActive',() => false)
+const isFileViewerModalActive = useState<boolean>('isFileViewerModalActive',() => false)
+const fileDataUrls = useState<Array<string>>('fileDataUrls', () => [])
 
 //Mock data only
 const approvers = [
@@ -412,7 +491,8 @@ const units:Array<string> = ['Pieces','Cartons','Pallets']
 const supplierItems = supplierStore.supplierRecords.reduce((acc:Array<any>,res,i) => {
   acc.push({
     label: res.name,
-    click: () => onAddSupplier(res)
+    click: () => selectedSupplier.value = res
+    //click: () => onAddSupplier(res)
   })
   return acc
 },[])
@@ -462,6 +542,22 @@ const meqsSupplierItems = computed(() => {
 })
 
 const supplierRows = ref<Array<Supplier>>([])
+const isNextButtonDisabled = computed(() => {
+  if (currentStepperItem.value === 0) {
+    if (selectedTransactionNumber.value) {
+      stepperItems.value[1].disabled = false
+      return false
+    }
+    return true
+  }else if(currentStepperItem.value === 1){
+    if (supplierRows.value && supplierRows.value.length > 0) {
+      stepperItems.value[2].disabled = false
+      return false
+    }
+    return true
+  }
+  return false
+})
 
 //methods
 function onAddItem() {
@@ -508,6 +604,12 @@ async function onDeleteItem() {
   meqsParticulars.value.splice(index,1)
 }
 
+function onToggleAddSupplierModal(){
+  //@ts-expect-error
+  selectedSupplier.value = undefined
+  isAddSupplierModalActive.value = !isAddSupplierModalActive.value
+}
+
 function onAddSupplier(supplier:Supplier) {
   console.log("onAddSupplier ", supplier)
   if (supplier) {
@@ -538,7 +640,7 @@ function onAddSupplier(supplier:Supplier) {
     supplierRows.value.push({
       id: supplier.id,
       name: supplier.name,
-      attachments: []
+      attachments: supplier.attachments
     })
 
     //Add supplier to canvass item table in third tab
@@ -553,12 +655,21 @@ function onAddSupplier(supplier:Supplier) {
       })
     })
 
+    //@ts-expect-error
+    selectedSupplier.value = undefined
     toast.add({
             title: 'Supplier successfuly added',
             icon: 'i-heroicons-check-circle-20-solid'
         })
+    isAddSupplierModalActive.value = false
+    console.log("Attachments ",supplier.attachments)
     return
   }
+  toast.add({
+        title: 'No supplier selected',
+        icon: 'i-heroicons-x-mark-16-solid'
+    })
+  return
 }
 
 function onDeleteSupplier(supplier:Supplier){
@@ -632,4 +743,24 @@ function onToggleTab(action:string = 'next') {
   currentStepperItem.value--
 }
 
+function handleFileProcessing(files:Array<File>) {
+  console.log("FilePond succesfully processed file ", files);
+  selectedSupplier.value.attachments = files
+}
+
+function onToggleViewFilesModal(files:any) {
+  console.log("onToggleViewFilesModal",files)
+  if (files && files.length > 0) {
+    let fileArray = files
+    if (isProxy(files)) {
+      fileArray = toRaw(files)
+      console.log("File is proxy", fileArray)
+    }
+    fileDataUrls.value = convertFilesToDataUrls(fileArray)
+    isFileViewerModalActive.value = true
+    return
+  }
+  console.error("Files is undefined")
+  return
+}
 </script>
